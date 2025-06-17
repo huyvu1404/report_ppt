@@ -1,6 +1,6 @@
-from shapes import *
+from slide_utils import *
 from text_box import *
-from presentations import *
+from slides_builder import *
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
        

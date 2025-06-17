@@ -1,10 +1,8 @@
 from .slide_utils import *
-from slides_builder import *
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
-from charts_generator import *
-from utils import *
-from llm import *
+from charts_generator import prepare_nested_data, generate_nested_chart
+from llm import prepare_json_data_4th, get_fourth_insight
        
 def create_fourth_slide(prs, current_data, previous_data, main_topic, current_json_data, previous_json_data):
     slide_layout = prs.slide_layouts[6]
@@ -31,8 +29,7 @@ def create_fourth_slide(prs, current_data, previous_data, main_topic, current_js
     create_text_box(shapes, texts, (left, top, width, height), fontsize=Pt(14), fontweight="bold", text_color=RGBColor(255, 255, 255), text_alignment=1)
 
     left, top, width, height = Inches(0.00), Inches(1.11), Inches(10.00), Inches(1.03)
-    # texts = """Tổng thảo luận của SHB giảm 22% so với tuần trước với mức tổng là 3,476 thảo luận.\nFacebook sở hữu thị phần dẫn đầu với hơn 57%, theo sau là News với 25,6%. Facebook và News đóng vai trò chủ lực truyền thông các tuyến nội dung về phần trăm cổ tức và danh sách cổ đông ngân hàng SHB. Ngoài ra, nhóm đối tác cộng đồng của ngân hàng vẫn duy trì vai trò truyền thông thương hiệu quan trọng, tiêu điểm của tuần là giải thưởng “Ngân hàng Tốt nhất cho khách hàng Khu vực công tại Việt Nam năm 2025”.\nTrong khi đó, kênh Tiktok đứng thứ 3 với 10,6% thị phần, ghi nhận lượng lớn đề cập về ban lãnh đạo Bầu Hiển.
-    # """
+
     transformed_json = prepare_json_data_4th(current_json_data, previous_json_data, main_topic)
     insight = get_fourth_insight(transformed_json)
     create_text_box(shapes, insight, (left, top, width, height), fontsize=Pt(9), text_color=RGBColor(0, 0, 0), text_alignment=1, shadow=True, adjustment=0.05, color=RGBColor(255, 243, 205))

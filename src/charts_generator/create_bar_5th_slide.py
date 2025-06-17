@@ -89,7 +89,7 @@ def generate_stacked_bar_chart_5th(data) -> BytesIO:
     ax.axhline(0, color='gray', linewidth=0.5)
     ax.tick_params(axis='x', length=0, width=0)
     ax.set_xticks(x_positions)
-    x_labels = [f"{x_label.split(" ")[0]}..."  if len(x_label) > 10 else x_label for x_label in x_labels]  # Giới hạn độ dài nhãn
+    x_labels = [f"{x_label.split(" ")[0]}..."  if len(x_label) > 10 else x_label for x_label in x_labels] 
     ax.set_xticklabels(x_labels, fontsize = 5.5, fontweight='bold', color='black', rotation=45, ha='right')
     ax.set_xlim(-0.8 , max(x_positions) + 0.8)
     ax.set_ylim(0, 35)

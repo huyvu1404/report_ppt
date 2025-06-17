@@ -1,10 +1,9 @@
 from .slide_utils import *
-from slides_builder import *
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
-from charts_generator import *
-from utils import *
-from llm import *
+from utils import LOGO_SIZES
+from llm import prepare_json_data_3rd, get_third_insight
+from charts_generator import prepare_table_data, generate_table
        
 def create_third_slide(prs, current_data, main_topic, current_json_data):
     slide_layout = prs.slide_layouts[6]
@@ -31,8 +30,6 @@ def create_third_slide(prs, current_data, main_topic, current_json_data):
     create_text_box(shapes, texts, (left, top, width, height), fontsize=Pt(14), fontweight="bold", text_color=RGBColor(255, 255, 255), text_alignment=1)
 
     left, top, width, height = Inches(0.14), Inches(0.89), Inches(9.82), Inches(1.2)
-#     texts = """Hoạt động fanpage tạo thảo luận tích cực nổi bật tại các ngân hàng Techcombank và VPBank nhờ hoạt động tương tác xúc tiến chiến dịch như minigame và livestream. Cùng với đó, choỗi hoạt động săn vé sự kiện cũng ghi nhận bàn luận sôi nổi.
-# Thảo luận tiêu cực của tuần vẫn xoay quanh lỗi hệ thống săn vé sự kiện trên ứng dụng và website chiến dịch, tiêu biểu đến từ VPBank và Techcombank."""
     transformed_json = prepare_json_data_3rd(current_json_data)
     insight = get_third_insight(transformed_json)
     create_rounded_rectangle(shapes, (left, top, width, height), adjustment=0.1, color=RGBColor(255, 243, 205), texts=insight, fontsize=Pt(9), text_color=RGBColor(0, 0, 0), text_alignment=1, shadow=True)
@@ -43,8 +40,7 @@ def create_third_slide(prs, current_data, main_topic, current_json_data):
     width = Inches(9.82) * len(topics) / 8
     bar_left = Inches(0.22) + (Inches(9.82) - width) / 2
     shapes.add_picture(chart, bar_left, Inches(2.21), width, Inches(3.42))
-    # shapes.add_picture('./img/logo-slide3.png', Inches(1.6), Inches(2.1), width=Inches(7.91), height=Inches(0.27))
-
+   
     top = Inches(2.18)
     current_left = Inches(1.66) + bar_left
     for i, topic in enumerate(topics):

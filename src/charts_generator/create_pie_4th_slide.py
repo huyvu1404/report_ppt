@@ -8,11 +8,11 @@ from matplotlib.patches import Rectangle, Patch
 
 
 def draw_doughnut(ax, radius, values, labels, colors, width=0.35):
-    percentages = np.round(values / values.sum() * 100, 1)
+    sizes = np.round(values / values.sum() * 100, 1)
     color_values = [colors[label] for label in labels]
 
     wedges, _ = ax.pie(
-        percentages,
+        sizes,
         labels=None,
         radius=radius,
         startangle=90,
@@ -23,8 +23,11 @@ def draw_doughnut(ax, radius, values, labels, colors, width=0.35):
     THRESHOLD = 16
     RECT_WIDTH = 0.4
     RECT_HEIGHT = 0.3
-    angle_rad = []
+    angle_radians = []
     for i, wedge in enumerate(wedges):
+        if sizes[i] == 0:
+            angle_radians.append(0)
+            continue
         if i == 0:
             start = wedge.theta1  
             end = wedge.theta2
@@ -42,15 +45,17 @@ def draw_doughnut(ax, radius, values, labels, colors, width=0.35):
             else:
                 angle = (start + end) / 2
                 start = end
-        angle_rad.append(np.radians(angle))
+        angle_radians.append(np.radians(angle))
        
     for i in range(len(wedges)):
-        x, y = radius * np.cos(angle_rad[i]), radius * np.sin(angle_rad[i])
+        if sizes[i] == 0:
+            continue
+        x, y = radius * np.cos(angle_radians[i]), radius * np.sin(angle_radians[i])
         rect = Rectangle((x - 0.15, y), RECT_WIDTH, RECT_HEIGHT,
                          color=color_values[i], ec='white', linewidth=0.5, zorder=3)
         ax.add_patch(rect)
         ax.text(x - 0.15 + RECT_WIDTH / 2, y + RECT_HEIGHT / 2,
-                f'{percentages[i]}%', ha='center', va='center',
+                f'{sizes[i]}%', ha='center', va='center',
                 fontsize=5, color='white', fontweight='bold', zorder=4)
 
 def draw_legend(ax, labels, colors, title, bbox_anchor):
@@ -104,7 +109,7 @@ def setup_axes(ax, xlim, ylim):
 
 def render_single_chart(ax, df_sentiment, df_channel, legend_labels, colors_sentiment, colors_channel, colors,
                         direction='right', legend_title='Sắc thái', bbox_anchor=(0, 0.4), total_last_week=None):
-
+    
     draw_doughnut(ax, 1, df_sentiment.iloc[0, :].values, df_sentiment.columns.to_list(), colors_sentiment)
     draw_doughnut(ax, 1.4, df_channel.iloc[0, :].values, df_channel.columns.to_list(), colors_channel, width=0.45)
     draw_legend(ax,legend_labels, colors, title=legend_title, bbox_anchor=bbox_anchor)
@@ -153,8 +158,11 @@ def prepare_nested_data(current_data, previous_data, main_topic):
 
 def generate_nested_chart(current_sentiment_data, current_channel_data, previous_sentiment_data, previous_channel_data):
     fig, (ax_left, ax_right) = plt.subplots(1, 2, figsize=(10, 5))
-
-
+    current_channels = current_channel_data.columns.tolist()
+    previous_channels = previous_channel_data.columns.tolist()
+    channels = current_channels + [channel for channel in previous_channels if channel not in current_channels]
+    current_channel_data = current_channel_data.reindex(columns=channels, fill_value=0)
+    previous_channel_data = previous_channel_data.reindex(columns=channels, fill_value=0)
     render_single_chart(
         ax=ax_left,
         df_sentiment=current_sentiment_data,

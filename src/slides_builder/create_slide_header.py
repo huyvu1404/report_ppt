@@ -1,6 +1,6 @@
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
-from slide_utils import create_rectangle, create_rounded_rectangle, create_text_box, create_section_rectangle
+from .slide_utils import create_rectangle, create_rounded_rectangle, create_text_box, create_section_rectangle
 
 def create_slide_header(shapes, texts, shape_colors, text_colors, width_scale):
     SECTION_LEFT, SECTION_TOP, SECTION_WIDTH, SECTION_HEIGHT = Inches(2.31), Inches(0.13), Inches(1.42), Inches(0.2)

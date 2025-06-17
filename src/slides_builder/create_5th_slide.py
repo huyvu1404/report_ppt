@@ -1,10 +1,8 @@
 from .slide_utils import *
-from slides_builder import *
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
-from charts_generator import *
-from utils import *
-from llm import *
+from charts_generator import prepare_stacked_bar_data_5th, generate_stacked_bar_chart_5th
+from llm import prepare_json_data_5th, get_fifth_insight
        
 def create_fifth_slide(prs, current_data, main_topic, current_json_data):
     slide_layout = prs.slide_layouts[6]

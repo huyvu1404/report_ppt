@@ -1,10 +1,9 @@
 from .slide_utils import *
-from slides_builder import *
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
 from charts_generator import *
-from utils import *
-from llm import *
+from utils import LOGO_SIZES
+from llm import prepare_json_data, get_first_insight
 from .create_slide_header import create_slide_header
 
        

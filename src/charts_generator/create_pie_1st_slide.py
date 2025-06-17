@@ -21,11 +21,13 @@ def draw_doughnut(ax, channels, df, total_compare, title, position):
     total = df.sum().sum()
     sizes = np.round(df.iloc[0, :].tolist() / total * 100, 1)
     color_values = [TOPIC_COLORS[channel] for channel in channels]
-    print(len(channels), len(sizes), len(color_values))
     wedges, _ = ax.pie(sizes, labels=None, startangle=90, colors=color_values, wedgeprops=dict(width=0.35, edgecolor='white'))
     angle_radians = []
     THRESHOLD = 16
     for i, wedge in enumerate(wedges):
+        if sizes[i] == 0:
+            angle_radians.append(0)
+            continue
         if i == 0:
             start = wedge.theta1  
             end = wedge.theta2
@@ -45,6 +47,8 @@ def draw_doughnut(ax, channels, df, total_compare, title, position):
                 start = end
         angle_radians.append(np.radians(angle)) 
     for i in range(len(wedges)):
+        if sizes[i] == 0:
+            continue
         x, y = np.cos(angle_radians[i]), np.sin(angle_radians[i])
         rect = plt.Rectangle((x - 0.15, y), RECT_WIDTH, RECT_HEIGHT, color=color_values[i], ec='white', linewidth=0.5, zorder=3)
         ax.add_patch(rect)
@@ -67,8 +71,11 @@ def generate_doughnut_chart(current_data, previous_data) -> BytesIO:
         return None
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(5, 2.5))
     fig.subplots_adjust(wspace=0.05)
-    channels = current_data.columns.tolist()
-    previous_data = previous_data[channels]
+    current_channels = current_data.columns.tolist()
+    previous_channels = previous_data.columns.tolist()
+    channels = current_channels + [channel for channel in previous_channels if channel not in current_channels]
+    current_data = current_data.reindex(columns=channels, fill_value=0)
+    previous_data = previous_data.reindex(columns=channels, fill_value=0)
     draw_doughnut(ax1, channels, current_data, total_compare=previous_data.sum().sum(), title="Tuần này", position='left')
     draw_doughnut(ax2, channels, previous_data, total_compare=current_data.sum().sum(), title="Tuần trước", position='right')
     fig.legend(labels = channels, loc='upper center', bbox_to_anchor=(0.5, 0.1), ncol=len(channels), fontsize=4, frameon=False, handlelength=0.65, handletextpad=0.5, columnspacing=0.5)

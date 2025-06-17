@@ -15,52 +15,58 @@ def draw_stacked_bar(ax, df, sentiments, x_positions, bottom):
     HEIGHT_RECT = 10
     for sentiment in sentiments:
         values = df[sentiment].astype(int).tolist()
-        sizes = np.round(df[sentiment] / df['Total'] * 100, 1).tolist()
+        sizes = [
+            round((v / t) * 100, 1) if t != 0 else 0
+            for v, t in zip(df[sentiment], df['Total'])
+        ]
         ax.bar(x, sizes, bottom=bottom, color=SENTIMENT_COLORS[sentiment], label=sentiment, width=WIDTH_BAR)
         for i, size in enumerate(sizes):
-            if size < HEIGHT_RECT:
-                y_positions[i] = rect_distance[i] + HEIGHT_RECT / 2
-                rect_distance[i] += HEIGHT_RECT
-            else:
-                center_pos = bottom[i] + size / 2
-                if center_pos >= rect_distance[i] + HEIGHT_RECT / 2:
-                    y_positions[i] = center_pos
-                    rect_distance[i] = bottom[i] + size
-                else:
+            if size > 0:
+                if size < HEIGHT_RECT:
                     y_positions[i] = rect_distance[i] + HEIGHT_RECT / 2
                     rect_distance[i] += HEIGHT_RECT
+                else:
+                    center_pos = bottom[i] + size / 2
+                    if center_pos >= rect_distance[i] + HEIGHT_RECT / 2:
+                        y_positions[i] = center_pos
+                        rect_distance[i] = bottom[i] + size
+                    else:
+                        y_positions[i] = rect_distance[i] + HEIGHT_RECT / 2
+                        rect_distance[i] += HEIGHT_RECT
 
         for i in range(0, len(x_positions), 2):
-            if i + 1 < len(x_positions):
-                offset = 12
-                if sizes[i] > sizes[i + 1]:
-                    rect_distance[i] = max(rect_distance[i + 1] + offset, rect_distance[i]) if rect_distance[i] <= y_positions[i] + HEIGHT_RECT / 2 else rect_distance[i]
-                    y_positions[i] = max(y_positions[i + 1] + offset, y_positions[i])
-                     
-                else:
-                    y_positions[i + 1] = max(y_positions[i] + offset, y_positions[i + 1])
-                    rect_distance[i + 1] = max(rect_distance[i] + offset, rect_distance[i + 1]) if rect_distance[i + 1] <= y_positions[i + 1] + HEIGHT_RECT / 2 else rect_distance[i  + 1]
+            if sizes[i] > 0:
+                if i + 1 < len(x_positions):
+                    offset = 12
+                    if sizes[i] > sizes[i + 1]:
+                        rect_distance[i] = max(rect_distance[i + 1] + offset, rect_distance[i]) if rect_distance[i] <= y_positions[i] + HEIGHT_RECT / 2 else rect_distance[i]
+                        y_positions[i] = max(y_positions[i + 1] + offset, y_positions[i])
+                        
+                    else:
+                        y_positions[i + 1] = max(y_positions[i] + offset, y_positions[i + 1])
+                        rect_distance[i + 1] = max(rect_distance[i] + offset, rect_distance[i + 1]) if rect_distance[i + 1] <= y_positions[i + 1] + HEIGHT_RECT / 2 else rect_distance[i  + 1]
 
         for i in range(len(x_positions)):
-            width_rect = WIDTH_BAR * (1.4 if values[i] < 100 else 1.6 if values[i] < 1000 else 1.8)
+            if sizes[i] > 0:
+                width_rect = WIDTH_BAR * (1.4 if values[i] < 100 else 1.6 if values[i] < 1000 else 1.8)
 
-            rect = plt.Rectangle(
-                (x[i] - width_rect / 2, y_positions[i] - HEIGHT_RECT / 2),
-                width_rect, HEIGHT_RECT,
-                facecolor=SENTIMENT_COLORS[sentiment],
-                linewidth=0.5,
-                zorder=3
-            )
-            ax.add_patch(rect)
+                rect = plt.Rectangle(
+                    (x[i] - width_rect / 2, y_positions[i] - HEIGHT_RECT / 2),
+                    width_rect, HEIGHT_RECT,
+                    facecolor=SENTIMENT_COLORS[sentiment],
+                    linewidth=0.5,
+                    zorder=3
+                )
+                ax.add_patch(rect)
 
-            label = f'{values[i]}, {sizes[i]}%'
-            ax.text(
-                x[i], y_positions[i],
-                label,
-                ha='center', va='center',
-                fontsize=4.5, color='white', fontweight='bold',
-                zorder=4
-            )
+                label = f'{values[i]}, {sizes[i]}%'
+                ax.text(
+                    x[i], y_positions[i],
+                    label,
+                    ha='center', va='center',
+                    fontsize=4.5, color='white', fontweight='bold',
+                    zorder=4
+                )
 
         bottom += sizes
 
@@ -70,16 +76,19 @@ def prepare_stacked_bar_data_2nd(current_df: pd.DataFrame, previous_df: pd.DataF
     if current_data is None or previous_data is None:
         print("Error preparing data for stacked chart.")
         return None
-    topics = current_data.columns.tolist()
-    previous_data = previous_data[topics]
+    current_topics = current_data.columns.tolist()
+    previous_topics = previous_data.columns.tolist()
+    topics = current_topics + [topic for topic in previous_topics if topic not in current_topics]
+
+    current_data = current_data.reindex(columns=topics, fill_value=0)
+    previous_data = previous_data.reindex(columns=topics, fill_value=0)
+    
     merged = pd.concat([current_data.T, previous_data.T])
     merged = merged.sort_index(kind='stable', ascending=False) 
     shb_rows = merged[merged.index == "SHB"]
 
-    # Lọc các dòng còn lại
     other_rows = merged[merged.index != "SHB"]
 
-    # Nối lại, đưa SHB lên đầu
     result = pd.concat([shb_rows, other_rows])
     
     return result

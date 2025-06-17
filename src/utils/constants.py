@@ -25,7 +25,8 @@ BAR_CHANNEL_COLORS = {
     'Tiktok': '#1EAB4D',
     'Youtube': '#DF5327',
     'Instagram': '#27536B',
-    'Linkedin': '#646E17'
+    'Linkedin': '#646E17',
+    'Social': '#00AEEF',
 } 
 
 SUNBURST_CHANNEL_COLORS =  {
@@ -37,7 +38,8 @@ SUNBURST_CHANNEL_COLORS =  {
     'Tiktok': '#A59CC7',
     'Youtube': '#1797E0',
     'Instagram': '#27536B',
-    'Linkedin': '#646E17'
+    'Linkedin': '#646E17',
+    'Social': '#0070C0',
 } 
 
 

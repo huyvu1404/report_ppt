@@ -10,7 +10,7 @@ def load_data(path):
     try:   
         mask = (df['Channel'] == 'Social') & df['UrlTopic'].str.contains('www.instagram.com', na=False)
         df.loc[mask, 'Channel'] = 'Instagram'
-        df = df[df['Channel'] != 'Social']
+        # df = df[df['Channel'] != 'Social']
     except Exception as e:
         print(f"Error processing the data: {e}")
         return None

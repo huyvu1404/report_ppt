@@ -10,41 +10,42 @@ def draw_stacked_bar(ax, channels, x_positions, df, bottom, top, label=False):
     height_rect = top / 8
     rect_distance = np.zeros(len(x_positions))
     for channel in channels:
-        values = df.loc[channel].astype(int).tolist()
-        if label:
-            ax.bar(x_positions, values, bottom=bottom, color=BAR_CHANNEL_COLORS[channel],label=channel, width=WIDTH_BAR)
-        else:
-            ax.bar(x_positions, values, bottom=bottom, color=BAR_CHANNEL_COLORS[channel], width=WIDTH_BAR)
-        for i, (x, val) in enumerate(zip(x_positions, values)):
-            if val > 0:
-                if val < 10:
-                    width_rect = 0.4
-                elif val < 100:
-                    width_rect = 0.55
-                elif val < 1000:
-                    width_rect = 0.7
-                elif val < 10000:
-                    width_rect = 0.85
-                elif val < 100000:
-                    width_rect = 1
-                else:
-                    width_rect = 1.15
-
-                if rect_distance[i] > 0:
-                    if val/2 > rect_distance[i]:
-                        y = val / 2 
-                        rect_distance[i] = val/2 + top / 8
+        if channel in df.index: 
+            values = df.loc[channel].astype(int).tolist() 
+            if label:
+                ax.bar(x_positions, values, bottom=bottom, color=BAR_CHANNEL_COLORS[channel],label=channel, width=WIDTH_BAR)
+            else:
+                ax.bar(x_positions, values, bottom=bottom, color=BAR_CHANNEL_COLORS[channel], width=WIDTH_BAR)
+            for i, (x, val) in enumerate(zip(x_positions, values)):
+                if val > 0:
+                    if val < 10:
+                        width_rect = 0.4
+                    elif val < 100:
+                        width_rect = 0.55
+                    elif val < 1000:
+                        width_rect = 0.7
+                    elif val < 10000:
+                        width_rect = 0.85
+                    elif val < 100000:
+                        width_rect = 1
                     else:
-                        y  =  rect_distance[i]
+                        width_rect = 1.15
+
+                    if rect_distance[i] > 0:
+                        if val/2 > rect_distance[i]:
+                            y = val / 2 
+                            rect_distance[i] = val/2 + top / 8
+                        else:
+                            y  =  rect_distance[i]
+                            rect_distance[i] += top / 8
+                    else:
+                        y = 0
                         rect_distance[i] += top / 8
-                else:
-                    y = 0
-                    rect_distance[i] += top / 8
-                
-                rect = plt.Rectangle((x - width_rect / 2, y), width_rect, height_rect, color=BAR_CHANNEL_COLORS[channel], linewidth=0.5, zorder=3)
-                ax.add_patch(rect)
-                ax.text(x,  y + height_rect/2, str(val), ha='center', va='center', fontsize=5, color='white', fontweight='bold', zorder=4)           
-        bottom += values
+                    
+                    rect = plt.Rectangle((x - width_rect / 2, y), width_rect, height_rect, color=BAR_CHANNEL_COLORS[channel], linewidth=0.5, zorder=3)
+                    ax.add_patch(rect)
+                    ax.text(x,  y + height_rect/2, str(val), ha='center', va='center', fontsize=5, color='white', fontweight='bold', zorder=4)           
+            bottom += values
     for x, total, position in zip(x_positions, bottom, rect_distance):
         ax.text(x, position * 1.1, str(int(total)), ha='center', va='bottom', fontsize=7, fontweight='bold', color='black')
 
@@ -56,9 +57,15 @@ def generate_stacked_bar_chart(current_data, previous_data) -> BytesIO:
     fig_height = 2.18
     BAR_DISTANCE = 3
  
-    channels = list(set(current_data.index.tolist()) | set(previous_data.index.tolist())) 
-    topics = list(set(current_data.columns.tolist()) | set(previous_data.columns.tolist()))
-    previous_data = previous_data
+    current_channels = current_data.index.tolist()
+    previous_channels = previous_data.index.tolist()
+    channels = current_channels + [channel for channel in previous_channels if channel not in current_channels]
+
+    current_topics = current_data.columns.unique().tolist()
+    previous_topics = previous_data.columns.unique().tolist()
+    topics = current_topics + [topic for topic in previous_topics if topic not in current_topics]
+    current_data = current_data.reindex(columns=topics, fill_value=0)
+    previous_data = previous_data.reindex(columns=topics, fill_value=0)
     fig, ax = plt.subplots(figsize=(fig_width * len(topics) / 8 , fig_height))
     fig.subplots_adjust(wspace=0.05)
     x_labels = ["Tuần này", "Tuần trước"] * len(topics)
@@ -68,8 +75,8 @@ def generate_stacked_bar_chart(current_data, previous_data) -> BytesIO:
         x_positions.extend([base, base + 1])
     bottom = np.zeros(len(x_positions))
     max_value = max(current_data.iloc[:, :].sum().max(), previous_data.iloc[:, :].sum().max())
-    draw_stacked_bar(ax, channels, x_positions[::2][:current_data.shape[1]], current_data, bottom[::2][:current_data.shape[1]], top=max_value, label=True)
-    draw_stacked_bar(ax, channels, x_positions[1::2][:previous_data.shape[1]], previous_data, bottom[1::2][:previous_data.shape[1]], top=max_value, label=False)
+    draw_stacked_bar(ax, channels, x_positions[::2], current_data, bottom[::2], top=max_value, label=True)
+    draw_stacked_bar(ax, channels, x_positions[1::2], previous_data, bottom[1::2], top=max_value, label=False)
     for spine in ax.spines.values():
         spine.set_visible(False)
     ax.axhline(0, color='gray', linewidth=0.5)
