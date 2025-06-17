@@ -1,9 +1,10 @@
 from .slide_utils import *
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
-from utils import LOGO_SIZES
+from utils import LOGO_SIZES, PROJECT_DIR
 from llm import prepare_json_data_3rd, get_third_insight
 from charts_generator import prepare_table_data, generate_table
+
        
 def create_third_slide(prs, current_data, main_topic, current_json_data):
     slide_layout = prs.slide_layouts[6]
@@ -44,12 +45,11 @@ def create_third_slide(prs, current_data, main_topic, current_json_data):
     top = Inches(2.18)
     current_left = Inches(1.66) + bar_left
     for i, topic in enumerate(topics):
-        topic = topic.replace(" ", "")
-        
+        topic = topic.replace(" ", "")      
         width, height = LOGO_SIZES.get(topic)
-        left = current_left - width / 2
-       
-        shapes.add_picture(f'src/assets/icons/{topic}.png', left, top, width, height)
+        left = current_left - width / 2     
+        ICON_PATH = PROJECT_DIR / "assets/icons" / f"{topic}.png"
+        shapes.add_picture(str(ICON_PATH), left, top, width, height)
         if i < len(width_ratios) - 1:
             current_left += Inches((width_ratios[i] + width_ratios[i+1]) * 1.05 / 2)
 

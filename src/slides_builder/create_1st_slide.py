@@ -2,7 +2,7 @@ from .slide_utils import *
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
 from charts_generator import *
-from utils import LOGO_SIZES
+from utils import LOGO_SIZES, PROJECT_DIR
 from llm import prepare_json_data, get_first_insight
 from .create_slide_header import create_slide_header
 
@@ -56,5 +56,7 @@ def create_first_slide(prs, current_data, previous_data, main_topic, current_jso
         topic = topic.replace(" ", "")
         width, height = LOGO_SIZES.get(topic)
         left = based_left + i * spacing - width / 2
-        shapes.add_picture(f'src/assets/icons/{topic}.png', left, top, width, height)
+        ICON_PATH = PROJECT_DIR / "assets/icons" / f"{topic}.png"
+
+        shapes.add_picture(str(ICON_PATH), left, top, width, height)
 

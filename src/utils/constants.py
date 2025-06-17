@@ -1,4 +1,5 @@
 from pptx.util import Inches
+from pathlib import Path
 
 TOPIC_COLORS = {
     'VPBank': '#1EAB4D',
@@ -53,3 +54,6 @@ LOGO_SIZES = {
     "ACBBank": (Inches(0.30), Inches(0.12)),
     "MSB": (Inches(0.54), Inches(0.12)),
 }
+
+PROJECT_DIR  = Path(__file__).resolve().parents[2]
+print(PROJECT_DIR / "src/assets/icons")

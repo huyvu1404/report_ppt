@@ -5,13 +5,14 @@ from io import BytesIO
 import os
 import base64
 from data_processing import generate_json_data, load_data
+from utils import PROJECT_DIR
 
 # Theme setup (this must be done via config.toml — see instructions below)
 st.set_page_config(page_title="Slide Generator", layout="centered")
 
 def add_logo():
-    logo_path = "src/assets/logo.png"
-    if os.path.exists(logo_path):
+    logo_path = PROJECT_DIR / "assets/logo.png"
+    if os.path.exists(str(logo_path)):
         with open(logo_path, "rb") as f:
             data_url = base64.b64encode(f.read()).decode("utf-8")
         st.markdown(

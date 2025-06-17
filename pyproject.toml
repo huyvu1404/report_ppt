@@ -1,0 +1,34 @@
+[project]
+name = "report_ppt"
+version = "0.1.0"
+description = "A Streamlit app for automated chart and PPT generation"
+authors = [
+    { name = "Vũ Quang Huy", email = "huy.vu@kompa.ai" }
+]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "streamlit",
+    "pandas",
+    "matplotlib",
+    "python-pptx",
+    "openpyxl",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "flake8",
+    "ipykernel"
+]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"

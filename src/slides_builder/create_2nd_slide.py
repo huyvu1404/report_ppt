@@ -1,7 +1,7 @@
 from .slide_utils import *
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
-from utils import LOGO_SIZES
+from utils import LOGO_SIZES, PROJECT_DIR
 from llm import prepare_json_data_2nd, get_second_insight
 from charts_generator import prepare_stacked_bar_data_2nd, generate_stacked_bar_chart_2nd
 
@@ -51,5 +51,5 @@ def create_second_slide(prs, current_data, previous_data, main_topic, current_js
         topic = topic.replace(" ", "")
         width, height = LOGO_SIZES.get(topic)
         left = based_left + i * spacing - width / 2
-    
-        shapes.add_picture(f'src/assets/icons/{topic}.png', left, top, width, height)
+        ICON_PATH = PROJECT_DIR / "assets/icons" / f"{topic}.png"
+        shapes.add_picture(str(ICON_PATH), left, top, width, height)
