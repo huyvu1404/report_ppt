@@ -1,13 +1,12 @@
-import streamlit as st
-import pandas as pd
-from slides_builder import create_presentation
-from io import BytesIO
+
 import os
 import base64
-from data_processing import generate_json_data, load_data
+import streamlit as st
+from io import BytesIO
 from utils import PROJECT_DIR
+from slides_builder import create_presentation
+from data_processing import generate_json_data, load_data
 
-# Theme setup (this must be done via config.toml — see instructions below)
 st.set_page_config(page_title="Slide Generator", layout="centered")
 
 def add_logo():
@@ -31,7 +30,6 @@ def main():
         "<h3 style='text-align: top-center;'>📊 Tạo Slide Báo Cáo Tự Động</h3>",
         unsafe_allow_html=True
     )
-
     uploaded_this_week = st.file_uploader("📂 Upload dữ liệu **tuần này** (.xlsx)", type=["xlsx"])
     uploaded_last_week = st.file_uploader("📂 Upload dữ liệu **tuần trước** (.xlsx)", type=["xlsx"])
 

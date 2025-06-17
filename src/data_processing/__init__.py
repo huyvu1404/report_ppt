@@ -63,6 +63,7 @@ def prepare_data(df, main_topic='SHB', rows = None, columns = None, values = Non
     pivot = pivot_data(df, main_topic, rows, columns, values, aggfunc)
     if pivot is None:
         return None
+    
     return pivot
 
 def generate_json_data(path: str):
@@ -75,6 +76,7 @@ def generate_json_data(path: str):
         .apply(lambda x: x.nlargest(10, "Interactions"), include_groups=False)
     )
     top_10_posts_per_topic = top_10_posts_per_topic.reset_index().drop(columns="level_1")[['Topic', 'Title', 'Content', 'Description', 'UrlTopic', 'Channel', 'Interactions']]
+    top_10_posts_per_topic = top_10_posts_per_topic.where(pd.notna(top_10_posts_per_topic), None)
     top_10_topics = top_10_posts_per_topic.groupby("Topic").apply(lambda x: x.to_dict(orient='records'), include_groups=False)
     top_10_topics.index = top_10_topics.index.map(lambda x: x.split('-')[0].strip())
     
@@ -103,8 +105,7 @@ def generate_json_data(path: str):
         ]
 
         channels = [
-            {  
-                "channel": channel,
+            {  "channel": channel,
                 "total": int(sum(sentiments.values())),
                 "sentiments": sentiments
             }
@@ -129,3 +130,4 @@ def generate_json_data(path: str):
     jsonfile = json.dumps(final_dict, ensure_ascii=False, indent=2)
         
     return jsonfile
+
