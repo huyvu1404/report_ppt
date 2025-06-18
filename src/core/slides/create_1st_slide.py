@@ -1,9 +1,9 @@
 from .slide_utils import *
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
-from charts_generator import *
-from utils import LOGO_SIZES, PROJECT_DIR
-from llm import prepare_json_data, get_first_insight
+from core.charts import prepare_doughnut_data, generate_doughnut_chart, prepare_stacked_bar_data, generate_stacked_bar_chart
+from constants import LOGO_SIZES, PROJECT_DIR
+from core.insights import prepare_json_data, get_first_insight
 from .create_slide_header import create_slide_header
 
        
@@ -23,6 +23,7 @@ def create_first_slide(prs, current_data, previous_data, main_topic, current_jso
 
     insight_left, insight_top, insight_width, insight_height = Inches(0.07), Inches(0.9), Inches(4.61), Inches(2.52)
     transformed_json_data = prepare_json_data(current_json, previous_json)
+  
     insight = get_first_insight(transformed_json_data) 
     create_rounded_rectangle(shapes, (insight_left, insight_top, insight_width, insight_height), adjustment=0.05, color=RGBColor(255, 243, 205), texts=insight, fontsize=Pt(9), text_color=RGBColor(0, 0, 0), text_alignment=1, shadow=True)
     
@@ -43,20 +44,21 @@ def create_first_slide(prs, current_data, previous_data, main_topic, current_jso
     stacked_bar, topics = generate_stacked_bar_chart(current_data_bar, previous_data_bar)
     width = Inches(9.24) * len(topics) / 8
     stacked_bar_left = Inches(0.29) + (Inches(9.24) - width) / 2
-    shapes.add_picture(stacked_bar, stacked_bar_left, Inches(3.57), width=width, height=Inches(1.77))
-    
-    left, top, width, height = Inches(0.41), Inches(3.55), Inches(3.5), Inches(0.22)
-    title = "KÊNH THẢO LUẬN VỀ SHB VÀ CÁC NGÂN HÀNG ĐỐI THỦ"
-    create_rectangle(shapes, (left, top, width, height), color=RGBColor(246, 146, 0), shadow=False, fontweight="bold", texts=title, fontsize=Pt(7), text_color=RGBColor(255, 255, 255), text_alignment=2)
-    
-    spacing = Inches(1.17)
-    top = Inches(5.3)
-    based_left = stacked_bar_left + Inches(0.51)
-    for i, topic in enumerate(topics):
-        topic = topic.replace(" ", "")
-        width, height = LOGO_SIZES.get(topic)
-        left = based_left + i * spacing - width / 2
-        ICON_PATH = PROJECT_DIR / "assets/icons" / f"{topic}.png"
+    if stacked_bar:
+        shapes.add_picture(stacked_bar, stacked_bar_left, Inches(3.57), width=width, height=Inches(1.77))
+        spacing = Inches(1.17)
+        top = Inches(5.3)
+        based_left = stacked_bar_left + Inches(0.51)
+        for i, topic in enumerate(topics):
+            topic = topic.replace(" ", "")
+            width, height = LOGO_SIZES.get(topic)
+            left = based_left + i * spacing - width / 2
+            ICON_PATH = PROJECT_DIR / "assets/icons" / f"{topic}.png"
 
-        shapes.add_picture(str(ICON_PATH), left, top, width, height)
+            shapes.add_picture(str(ICON_PATH), left, top, width, height)
+
+        left, top, width, height = Inches(0.41), Inches(3.55), Inches(3.5), Inches(0.22)
+        title = "KÊNH THẢO LUẬN VỀ SHB VÀ CÁC NGÂN HÀNG ĐỐI THỦ"
+        create_rectangle(shapes, (left, top, width, height), color=RGBColor(246, 146, 0), shadow=False, fontweight="bold", texts=title, fontsize=Pt(7), text_color=RGBColor(255, 255, 255), text_alignment=2)
+        
 

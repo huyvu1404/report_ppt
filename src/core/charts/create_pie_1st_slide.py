@@ -3,8 +3,9 @@ import numpy as np
 import pandas as pd
 from pydantic import BaseModel
 import matplotlib.pyplot as plt
-from data_processing import prepare_data
-from utils import TOPIC_COLORS
+from matplotlib.patches import Patch
+from core.data_processing import prepare_data
+from constants import TOPIC_COLORS
 
 def draw_doughnut(ax, channels, df, total_compare, title, position):
     RECT_WIDTH = 0.41
@@ -50,6 +51,8 @@ def draw_doughnut(ax, channels, df, total_compare, title, position):
         if sizes[i] == 0:
             continue
         x, y = np.cos(angle_radians[i]), np.sin(angle_radians[i])
+        if y > 0:
+            y -= RECT_HEIGHT / 2
         rect = plt.Rectangle((x - 0.15, y), RECT_WIDTH, RECT_HEIGHT, color=color_values[i], ec='white', linewidth=0.5, zorder=3)
         ax.add_patch(rect)
         ax.text(x - 0.15 + RECT_WIDTH / 2, y + RECT_HEIGHT / 2, f'{sizes[i]}%', ha='center', va='center', fontsize=5, color='white', fontweight='bold', zorder=4)
@@ -69,26 +72,35 @@ def generate_doughnut_chart(current_data, previous_data) -> BytesIO:
     if current_data is None or previous_data is None:
         print("No data available for doughnut chart.")
         return None
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(5, 2.5))
-    fig.subplots_adjust(wspace=0.05)
-    current_channels = current_data.columns.tolist()
-    previous_channels = previous_data.columns.tolist()
-    channels = current_channels + [channel for channel in previous_channels if channel not in current_channels]
-    current_data = current_data.reindex(columns=channels, fill_value=0)
-    previous_data = previous_data.reindex(columns=channels, fill_value=0)
-    draw_doughnut(ax1, channels, current_data, total_compare=previous_data.sum().sum(), title="Tuần này", position='left')
-    draw_doughnut(ax2, channels, previous_data, total_compare=current_data.sum().sum(), title="Tuần trước", position='right')
-    fig.legend(labels = channels, loc='upper center', bbox_to_anchor=(0.5, 0.1), ncol=len(channels), fontsize=4, frameon=False, handlelength=0.65, handletextpad=0.5, columnspacing=0.5)
-    buf = BytesIO()
-    plt.savefig(buf, format='png', dpi=300, bbox_inches='tight')
-    plt.close(fig) 
-    buf.seek(0)
-    return buf 
+    try:
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(5, 2.5))
+        fig.subplots_adjust(wspace=0.05)
+        current_channels = current_data.columns.tolist()
+        previous_channels = previous_data.columns.tolist()
+        channels = current_channels + [channel for channel in previous_channels if channel not in current_channels]
+        current_data = current_data.reindex(columns=channels, fill_value=0)
+        previous_data = previous_data.reindex(columns=channels, fill_value=0)
+        draw_doughnut(ax1, channels, current_data, total_compare=previous_data.sum().sum(), title="Tuần này", position='left')
+        draw_doughnut(ax2, channels, previous_data, total_compare=current_data.sum().sum(), title="Tuần trước", position='right')
+        
+        fig.legend(labels = channels, loc='upper center', bbox_to_anchor=(0.5, 0.1), ncol=len(channels), fontsize=4, frameon=False, handlelength=0.65, handletextpad=0.5, columnspacing=0.5)
+        buf = BytesIO()
+        plt.savefig(buf, format='png', dpi=300, bbox_inches='tight')
+        plt.close(fig) 
+        buf.seek(0)
+        return buf 
+    except Exception as e:
+        print(f"Error generating doughnut chart: {e}")
+        return None
 
 def prepare_doughnut_data(current_data: pd.DataFrame, previous_data: pd.DataFrame, main_topic: str, columns: str, values: str, aggfunc: str) -> pd.DataFrame:
-    current_data = prepare_data(current_data, main_topic=main_topic, columns=columns, values=values, aggfunc=aggfunc)
-    previous_data = prepare_data(previous_data, main_topic=main_topic, columns=columns, values=values, aggfunc=aggfunc)
-    if current_data is None or previous_data is None:
-        print("Error preparing data for doughnut chart.")
-        return None
-    return current_data, previous_data
+    try:
+        current_data = prepare_data(current_data, main_topic=main_topic, columns=columns, values=values, aggfunc=aggfunc)
+        previous_data = prepare_data(previous_data, main_topic=main_topic, columns=columns, values=values, aggfunc=aggfunc)
+        if current_data is None or previous_data is None:
+            print("Error preparing data for doughnut chart.")
+            return None
+        return current_data, previous_data
+    except Exception as e:
+        print(f"Error preparing doughnut data: {e}")
+        return None, None

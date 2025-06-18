@@ -1,11 +1,11 @@
-from slide_utils import *
-from text_box import *
-from slides_builder import *
+from .slide_utils import *
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
        
-def create_sixth_slide(prs):
-    _, shapes = add_slide(prs)
+def create_sixth_slide(prs, current_data, main_topic, current_json):
+    slide_layout = prs.slide_layouts[6]
+    slide = prs.slides.add_slide(slide_layout)
+    shapes = slide.shapes
 
     left, top, width, height = Inches(2.31), Inches(0.13), Inches(1.42), Inches(0.2)
     spacing = Inches(0.16)

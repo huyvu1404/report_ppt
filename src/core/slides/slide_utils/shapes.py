@@ -72,8 +72,8 @@ def create_rounded_rectangle(shapes, attribute, **kwargs):
         p.alignment = kwargs.get('text_alignment', 1)
         
         font_size = kwargs.get('fontsize', Pt(8))
-        if len(kwargs.get('texts')) > 140:
-            font_size = Pt(8)
+        # if len(kwargs.get('texts')) > 140:
+        #     font_size = Pt(8)
         font_bold = kwargs.get('fontweight') == "bold"
         font_italic = kwargs.get('fontstyle') == "italic"
         font_color = kwargs.get('text_color', RGBColor(0, 0, 0))
@@ -85,7 +85,7 @@ def create_rounded_rectangle(shapes, attribute, **kwargs):
             run = p.add_run()
             if part.startswith("**") and part.endswith("**"):
                 content = part[2:-2]
-                run.text = content.upper()  # Nếu không muốn in hoa thì dùng: content
+                run.text = content
                 run.font.bold = True
             else:
                 run.text = part
@@ -158,8 +158,8 @@ def create_rectangle(shapes, attribute, **kwargs):
         p = text_frame.paragraphs[0]
         p.alignment = kwargs.get('text_alignment', 1)
         font_size = kwargs.get('fontsize', Pt(8))
-        if len(kwargs.get('texts')) > 140:
-            font_size = Pt(8)
+        # if len(kwargs.get('texts')) > 140:
+        #     font_size = Pt(8)
         font_bold = kwargs.get('fontweight') == "bold"
         font_italic = kwargs.get('fontstyle') == "italic"
         font_color = kwargs.get('text_color', RGBColor(0, 0, 0))
@@ -171,7 +171,7 @@ def create_rectangle(shapes, attribute, **kwargs):
             run = p.add_run()
             if part.startswith("**") and part.endswith("**"):
                 content = part[2:-2]
-                run.text = content.upper()  # Nếu không muốn in hoa thì dùng: content
+                run.text = content
                 run.font.bold = True
             else:
                 run.text = part

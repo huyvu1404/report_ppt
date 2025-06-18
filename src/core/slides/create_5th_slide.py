@@ -1,8 +1,8 @@
 from .slide_utils import *
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
-from charts_generator import prepare_stacked_bar_data_5th, generate_stacked_bar_chart_5th
-from llm import prepare_json_data_5th, get_fifth_insight
+from core.charts import prepare_stacked_bar_data_5th, generate_stacked_bar_chart_5th
+from core.insights import prepare_json_data_5th, get_fifth_insight
        
 def create_fifth_slide(prs, current_data, main_topic, current_json_data):
     slide_layout = prs.slide_layouts[6]
@@ -30,7 +30,7 @@ def create_fifth_slide(prs, current_data, main_topic, current_json_data):
 
     left, top, width, height = Inches(0), Inches(0.92), Inches(10), Inches(1.77)
     transformed_json = prepare_json_data_5th(current_json_data, main_topic)
-    insight = get_fifth_insight(transformed_json)
+    insight = get_fifth_insight(transformed_json) 
     create_text_box(shapes, insight, (left, top, width, height), fontsize=Pt(9), text_color=RGBColor(0, 0, 0), text_alignment=1, shadow=True, adjustment=0.05, color=RGBColor(255, 243, 205))
     
 
@@ -41,4 +41,5 @@ def create_fifth_slide(prs, current_data, main_topic, current_json_data):
         aggfunc='count'
         )
     chart = generate_stacked_bar_chart_5th(data)
-    shapes.add_picture(chart, Inches(0), Inches(2.90), Inches(9.74), Inches(2.64))    
+    if chart:
+        shapes.add_picture(chart, Inches(0), Inches(2.90), Inches(9.74), Inches(2.64))    

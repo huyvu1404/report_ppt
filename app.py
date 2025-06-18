@@ -3,9 +3,9 @@ import os
 import base64
 import streamlit as st
 from io import BytesIO
-from utils import PROJECT_DIR
-from slides_builder import create_presentation
-from data_processing import generate_json_data, load_data
+from constants import PROJECT_DIR
+from core.slides import create_presentation
+from core.data_processing import generate_json_data, load_data
 
 st.set_page_config(page_title="Slide Generator", layout="centered")
 

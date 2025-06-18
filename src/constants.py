@@ -27,7 +27,7 @@ BAR_CHANNEL_COLORS = {
     'Youtube': '#DF5327',
     'Instagram': '#27536B',
     'Linkedin': '#646E17',
-    'Social': '#00AEEF',
+    'Social': '#01FAA7',
 } 
 
 SUNBURST_CHANNEL_COLORS =  {
@@ -40,8 +40,20 @@ SUNBURST_CHANNEL_COLORS =  {
     'Youtube': '#1797E0',
     'Instagram': '#27536B',
     'Linkedin': '#646E17',
-    'Social': '#0070C0',
+    'Social': '#01FAA7',
 } 
+
+MAP_CHANNELS = {
+    "Forum": "Diễn đàn",
+    "News": "Tin tức",
+    "Social": "Mạng xã hội",
+}
+
+MAP_SENTIMENTS = {
+    "Positive": "Tích cực",
+    "Neutral": "Trung lập",
+    "Negative": "Tiêu cực",
+}
 
 
 LOGO_SIZES = {
@@ -55,5 +67,4 @@ LOGO_SIZES = {
     "MSB": (Inches(0.54), Inches(0.12)),
 }
 
-PROJECT_DIR  = Path(__file__).resolve().parents[2]
-print(PROJECT_DIR / "src/assets/icons")
+PROJECT_DIR  = Path(__file__).resolve().parents[1]

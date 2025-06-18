@@ -1,9 +1,9 @@
 from .slide_utils import *
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
-from utils import LOGO_SIZES, PROJECT_DIR
-from llm import prepare_json_data_3rd, get_third_insight
-from charts_generator import prepare_table_data, generate_table
+from constants import LOGO_SIZES, PROJECT_DIR
+from core.insights import prepare_json_data_3rd, get_third_insight
+from core.charts import prepare_table_data, generate_table
 
        
 def create_third_slide(prs, current_data, main_topic, current_json_data):
@@ -32,28 +32,29 @@ def create_third_slide(prs, current_data, main_topic, current_json_data):
 
     left, top, width, height = Inches(0.14), Inches(0.89), Inches(9.82), Inches(1.2)
     transformed_json = prepare_json_data_3rd(current_json_data)
-    insight = get_third_insight(transformed_json)
+    insight = get_third_insight(transformed_json) 
     create_rounded_rectangle(shapes, (left, top, width, height), adjustment=0.1, color=RGBColor(255, 243, 205), texts=insight, fontsize=Pt(9), text_color=RGBColor(0, 0, 0), text_alignment=1, shadow=True)
 
     data = prepare_table_data(current_data, main_topic=main_topic, rows='Labels1',columns=['Topic', 'Sentiment'], values='Id', aggfunc='count')    
     chart, topics, labels, width_ratios = generate_table(data)
-    width_ratios[0] = 1
-    width = Inches(9.82) * len(topics) / 8
-    bar_left = Inches(0.22) + (Inches(9.82) - width) / 2
-    shapes.add_picture(chart, bar_left, Inches(2.21), width, Inches(3.42))
-   
-    top = Inches(2.18)
-    current_left = Inches(1.66) + bar_left
-    for i, topic in enumerate(topics):
-        topic = topic.replace(" ", "")      
-        width, height = LOGO_SIZES.get(topic)
-        left = current_left - width / 2     
-        ICON_PATH = PROJECT_DIR / "assets/icons" / f"{topic}.png"
-        shapes.add_picture(str(ICON_PATH), left, top, width, height)
-        if i < len(width_ratios) - 1:
-            current_left += Inches((width_ratios[i] + width_ratios[i+1]) * 1.05 / 2)
+    if chart:
+        width_ratios[0] = 1
+        width = Inches(9.82) * len(topics) / 8
+        bar_left = Inches(0.22) + (Inches(9.82) - width) / 2
+        shapes.add_picture(chart, bar_left, Inches(2.21), width, Inches(3.42))
+    
+        top = Inches(2.18)
+        current_left = Inches(1.66) + bar_left
+        for i, topic in enumerate(topics):
+            topic = topic.replace(" ", "")      
+            width, height = LOGO_SIZES.get(topic)
+            left = current_left - width / 2     
+            ICON_PATH = PROJECT_DIR / "assets/icons" / f"{topic}.png"
+            shapes.add_picture(str(ICON_PATH), left, top, width, height)
+            if i < len(width_ratios) - 1:
+                current_left += Inches((width_ratios[i] + width_ratios[i+1]) * 1.05 / 2)
 
-    left, top, width, height = bar_left - Inches(0.06), Inches(2.39), Inches(1.18), Inches(0.2)
-    distance = Inches(0.08)
-    for i in range(11):
-        create_rectangle(shapes, (left, top + i * (height + distance), width, height),texts=labels[i], text_color=RGBColor(0,0,0), fontsize=Pt(5.5), color=RGBColor(254, 219, 106), shadow=False, fontweight="bold", text_alignment=2)
+        left, top, width, height = bar_left - Inches(0.06), Inches(2.39), Inches(1.18), Inches(0.2)
+        distance = Inches(0.08)
+        for i in range(11):
+            create_rectangle(shapes, (left, top + i * (height + distance), width, height),texts=labels[i], text_color=RGBColor(0,0,0), fontsize=Pt(5.5), color=RGBColor(254, 219, 106), shadow=False, fontweight="bold", text_alignment=2)

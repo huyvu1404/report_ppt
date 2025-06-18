@@ -22,14 +22,13 @@ def create_text_box(shapes, texts, attribute, **kwargs):
     font_italic = kwargs.get('fontstyle') == "italic"
     font_color = kwargs.get('text_color', RGBColor(0, 0, 0))
 
-    # Xử lý văn bản chứa **...**
     parts = re.split(r'(\*\*.*?\*\*)', texts)
 
     for part in parts:
         run = p.add_run()
         if part.startswith("**") and part.endswith("**"):
             content = part[2:-2]
-            run.text = content.upper()  # Nếu không muốn in hoa thì dùng: content
+            run.text = content
             run.font.bold = True
         else:
             run.text = part

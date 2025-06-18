@@ -1,4 +1,3 @@
-
 from pptx import Presentation
 from pptx.util import Inches
 from .create_1st_slide import create_first_slide

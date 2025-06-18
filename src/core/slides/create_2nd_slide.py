@@ -1,9 +1,9 @@
 from .slide_utils import *
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
-from utils import LOGO_SIZES, PROJECT_DIR
-from llm import prepare_json_data_2nd, get_second_insight
-from charts_generator import prepare_stacked_bar_data_2nd, generate_stacked_bar_chart_2nd
+from constants import LOGO_SIZES, PROJECT_DIR
+from core.insights import prepare_json_data_2nd, get_second_insight
+from core.charts import prepare_stacked_bar_data_2nd, generate_stacked_bar_chart_2nd
 
 def create_second_slide(prs, current_data, previous_data, main_topic, current_json, previous_json):
     slide_layout = prs.slide_layouts[6]
@@ -32,7 +32,8 @@ def create_second_slide(prs, current_data, previous_data, main_topic, current_js
     left, top, width, height = Inches(0.14), Inches(0.96), Inches(9.82), Inches(1.39)
     
     transformed_json = prepare_json_data_2nd(current_json, previous_json)
-    insight = get_second_insight(transformed_json)
+
+    insight = get_second_insight(transformed_json)             
     create_rounded_rectangle(shapes, (left, top, width, height), adjustment=0.05, color=RGBColor(255, 243, 205), texts=insight, fontsize=Pt(9), text_color=RGBColor(0, 0, 0), text_alignment=1, shadow=True)
     
     left, top, width, height = Inches(0.14), Inches(2.52), Inches(9.74), Inches(2.86)
@@ -42,14 +43,16 @@ def create_second_slide(prs, current_data, previous_data, main_topic, current_js
     chart, topics = generate_stacked_bar_chart_2nd(data)
     width = Inches(9.59) * len(topics) / 8
     bar_left = Inches(0.14) + (Inches(9.59) - width) / 2
-    shapes.add_picture(chart, bar_left, Inches(2.5), width, Inches(2.5))
     
-    spacing = Inches(1.17)
-    top = Inches(5.01)
-    based_left = bar_left + Inches(0.66)
-    for i, topic in enumerate(topics):
-        topic = topic.replace(" ", "")
-        width, height = LOGO_SIZES.get(topic)
-        left = based_left + i * spacing - width / 2
-        ICON_PATH = PROJECT_DIR / "assets/icons" / f"{topic}.png"
-        shapes.add_picture(str(ICON_PATH), left, top, width, height)
+    if chart:
+        shapes.add_picture(chart, bar_left, Inches(2.5), width, Inches(2.5))
+        
+        spacing = Inches(1.17)
+        top = Inches(5.01)
+        based_left = bar_left + Inches(0.66)
+        for i, topic in enumerate(topics):
+            topic = topic.replace(" ", "")
+            width, height = LOGO_SIZES.get(topic)
+            left = based_left + i * spacing - width / 2
+            ICON_PATH = PROJECT_DIR / "assets/icons" / f"{topic}.png"
+            shapes.add_picture(str(ICON_PATH), left, top, width, height)
